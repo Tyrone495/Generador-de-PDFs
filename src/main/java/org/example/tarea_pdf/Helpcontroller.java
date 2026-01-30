@@ -1,0 +1,22 @@
+package org.example.tarea_pdf;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class Helpcontroller {
+
+    public void ayudaVentana() {
+        Stage stage = new Stage();
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("help.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 320, 200);
+            stage.setTitle("Ventana de Información");
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}
