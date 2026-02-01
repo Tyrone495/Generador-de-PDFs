@@ -148,6 +148,8 @@ public class HelloController {
 
             masterData.setAll(nuevosDatos);
 
+            total.setText(String.valueOf(masterData.size()));
+
             actualizarGrafico();
 
         }
