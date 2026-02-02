@@ -1,9 +1,9 @@
-name: CI/CD Build Multiplataforma
+name: CI/CD Build Final
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Esto permite correrlo manualmente si quieres
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,25 +24,30 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
 
-    - name: Compilar con Maven (Shaded JAR)
-      run: mvn clean package
+    - name: Compilar con Maven
+      run: mvn clean package -DskipTests
 
     - name: Organizar archivos para JPackage
       shell: bash
       run: |
         mkdir -p build_input
-        cp target/*-shaded.jar build_input/
+        # Esto copia el JAR ejecutable sin importar el nombre exacto
+        cp target/*.jar build_input/
+        # Borramos el original para que jpackage no vea dos archivos
+        rm -f build_input/original-*.jar
 
-    - name: Generar DEB (Linux)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Generar Instalador
+      shell: bash
       run: |
-        sudo apt-get update && sudo apt-get install -y fakeroot binutils
-        jpackage --type deb --dest dist --name "app-pdf-tarea" --input build_input --main-jar $(basename build_input/*-shaded.jar) --main-class org.example.tarea_pdf.Launcher --linux-shortcut --app-version 1.0.0
-
-    - name: Generar EXE (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        jpackage --type exe --dest dist --name "Instalador_Tarea_PDF" --input build_input --main-jar Tarea_PDF-1.0-SNAPSHOT-shaded.jar --main-class org.example.tarea_pdf.Launcher --win-dir-chooser --win-shortcut
+        # Detectamos el nombre del JAR que quedó
+        JAR_NAME=$(ls build_input/*.jar | xargs basename)
+        
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          sudo apt-get update && sudo apt-get install -y fakeroot binutils
+          jpackage --type deb --dest dist --name "app-pdf-tarea" --input build_input --main-jar "$JAR_NAME" --main-class org.example.tarea_pdf.Launcher --linux-shortcut
+        else
+          jpackage --type exe --dest dist --name "Instalador_Tarea_PDF" --input build_input --main-jar "$JAR_NAME" --main-class org.example.tarea_pdf.Launcher --win-dir-chooser --win-shortcut
+        fi
 
     - name: Guardar Instaladores
       uses: actions/upload-artifact@v4
