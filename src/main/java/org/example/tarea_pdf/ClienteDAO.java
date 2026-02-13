@@ -116,8 +116,8 @@ public class ClienteDAO {
             }
 
         } catch (IOException e) {
-            System.err.println("Error leyendo el CSV");
-            e.printStackTrace();
+            System.out.println("Error leyendo el CSV");
+            System.err.println("Seleccione el archivo otra vez, por favor.");
         }
 
         return clientes;

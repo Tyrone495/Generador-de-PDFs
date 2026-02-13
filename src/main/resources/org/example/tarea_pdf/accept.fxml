@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<StackPane alignment="CENTER_LEFT" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.tarea_pdf.SelectController">
+
+    <VBox spacing="20">
+        <Label text="¿Desea Guardar el Archivo?"/>
+        <padding>
+            <Insets bottom="20" left="20"/>
+        </padding>
+        <HBox spacing="20">
+            <Button fx:id="button_cancelar" text="Cancelar"/>
+            <Button fx:id="button_aceptar" text="Aceptar"/>
+        </HBox>
+    </VBox>
+
+
+
+</StackPane>

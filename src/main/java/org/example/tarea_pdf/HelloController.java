@@ -5,9 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
@@ -16,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -27,9 +24,10 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+
 import java.util.stream.Collectors;
 
 public class HelloController {
@@ -57,11 +55,11 @@ public class HelloController {
     @FXML
     public BarChart<String, Number> graficoBarras;
     @FXML
-    public PieChart graficoPastel;
+    public PieChart graficoPastel = new PieChart();
     @FXML
-    public RadioButton rbBarras;
+    public RadioButton rbBarras = new RadioButton();
     @FXML
-    public RadioButton rbPastel;
+    public RadioButton rbPastel = new RadioButton();
     @FXML
     public Button help_button;
 
@@ -93,8 +91,9 @@ public class HelloController {
      */
 
     public void initialize() {
-
-
+        SelectController select = new SelectController();
+        Helpcontroller help = new Helpcontroller();
+        ToggleGroup group = new ToggleGroup();
 
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -103,22 +102,23 @@ public class HelloController {
 
         tabla.setItems(filteredData);
 
-        ToggleGroup group = new ToggleGroup();
+
         rbBarras.setToggleGroup(group);
         rbPastel.setToggleGroup(group);
         rbBarras.setSelected(true);
 
         cbCriterio.getItems().setAll("Nombre", "Email", "Ciudad", "Ver Todos");
         cbCriterio.getSelectionModel().selectFirst();
-        cbCriterio.valueProperty().addListener((obs, oldV, newV) -> actualizarInterfaz());
+        cbCriterio.valueProperty().addListener((obs, oldV, newV) -> actualizarInterfazCompleta());
 
         group.selectedToggleProperty().addListener((obs, oldV, newV) -> actualizarGrafico());
 
-        csv_button.setOnAction(actionEvent -> SeleccionarCSV());
-        changes_button.setOnAction(actionEvent -> actualizarInterfaz());
-        pdf_button.setOnAction(actionEvent -> exportarAPDF());
 
-        Helpcontroller help = new Helpcontroller();
+
+        changes_button.setOnAction(actionEvent -> aplicarfiltros());
+        csv_button.setOnAction(actionEvent -> SeleccionarCSV());
+        pdf_button.setOnAction(actionEvent -> select.Selectventana());
+
         help_button.setOnAction(actionEvent -> help.ayudaVentana());
 
 
@@ -197,17 +197,21 @@ public class HelloController {
      */
 
 
-    private void actualizarInterfaz() {
 
+
+    private void actualizarInterfazCompleta() {
         String criterio = cbCriterio.getValue();
 
-        total.setText("0");
         colNombre.setVisible(false);
         colEmail.setVisible(false);
         colCiudad.setVisible(false);
 
         switch (criterio) {
             case "Ver Todos" -> {
+                masterData.clear();
+                List<Cliente> clientes = clienteDAO.obtenerTodos();
+                masterData.addAll(clientes);
+                total.setText(String.valueOf(masterData.size()));
                 colNombre.setVisible(true);
                 colEmail.setVisible(true);
                 colCiudad.setVisible(true);
@@ -215,11 +219,9 @@ public class HelloController {
             case "Nombre" -> colNombre.setVisible(true);
             case "Email"  -> colEmail.setVisible(true);
             case "Ciudad" -> colCiudad.setVisible(true);
-            default -> {
-            String lol = String.valueOf(masterData.size());
-            total.setText(lol);
-            }
         }
+
+        total.setText(String.valueOf(masterData.size()));
 
         actualizarGrafico();
     }
@@ -241,8 +243,13 @@ public class HelloController {
 
 
     @FXML
-    private void exportarAPDF() {
+    public void exportarAPDF() {
 
+        File archivoDestino = elegirDestinoPDF();
+
+        if (archivoDestino == null) {
+            return;
+        }
         try (PDDocument doc = new PDDocument()) {
             PDPage page = new PDPage();
             doc.addPage(page);
@@ -259,7 +266,6 @@ public class HelloController {
                 String info = c.getId() + " | " + c.getNombre() + " | " + c.getEmail() + " | " + c.getCiudad();
                 content.showText(info);
                 content.newLineAtOffset(0, -12);
-
             }
             content.endText();
 
@@ -275,13 +281,45 @@ public class HelloController {
             content.drawImage(img, 40, 50, 500, 600);
 
             content.close();
-            doc.save("reporte.pdf");
+            doc.save(archivoDestino);
+
 
         } catch (Exception e) {
+            System.err.println("Error detallado: " + e.getMessage());
             e.printStackTrace();
         }
+    }
 
+    @FXML
+    private void aplicarfiltros() {
+        masterData.clear();
+        String name_criteria = txt_name.getText();
+        List<Cliente> clientes = clienteDAO.obtenerPorNombreContiene(name_criteria);
+        List <Cliente> resultado = new ArrayList<>();
 
+        for (Cliente c : clientes) {
+            if (c.getNombre().toLowerCase().contains(name_criteria.toLowerCase())) {
+                resultado.add(c);
+            }
+
+        }
+        masterData.addAll(resultado);
+        total.setText(String.valueOf(masterData.size()));
+
+        actualizarGrafico();
+    }
+
+    private File elegirDestinoPDF() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Documento");
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf")
+        );
+
+        fileChooser.setInitialFileName("reporte_clientes.pdf");
+
+        return fileChooser.showSaveDialog(null);
     }
 
 
