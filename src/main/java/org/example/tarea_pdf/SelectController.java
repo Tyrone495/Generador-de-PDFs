@@ -27,7 +27,7 @@ public class SelectController {
     public void Selectventana() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("accept.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 800, 800);
+            Scene scene = new Scene(fxmlLoader.load(), 300, 120);
             stage2.setTitle("Ventana de Guardado");
             stage2.setScene(scene);
             stage2.show();
