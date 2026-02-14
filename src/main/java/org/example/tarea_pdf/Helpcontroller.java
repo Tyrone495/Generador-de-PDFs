@@ -12,7 +12,7 @@ public class Helpcontroller {
         Stage stage = new Stage();
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("help.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+            Scene scene = new Scene(fxmlLoader.load(), 300, 120);
             stage.setTitle("Ventana de Información");
             stage.setScene(scene);
             stage.show();
@@ -22,3 +22,4 @@ public class Helpcontroller {
     }
 
 }
+
