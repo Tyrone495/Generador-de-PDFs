@@ -15,28 +15,24 @@ class ClienteTest {
 
     @Test
     void getId() {
-        Assertions.assertAll(() -> assertEquals(23,cliente.getId()),
-                () -> assertEquals(23,12));
+        assertEquals(23,cliente.getId());
     }
 
     @Test
     void getNombre() {
         Cliente cliente = new Cliente(id, nombre, email ,ciudad);
-        Assertions.assertAll(() -> assertEquals("Pepe",cliente.getNombre()),
-                () -> assertEquals("Pepe", "Juan"));
+        assertEquals("Pepe",cliente.getNombre());
     }
 
     @Test
     void getEmail() {
         Cliente cliente = new Cliente(id, nombre, email ,ciudad);
-        Assertions.assertAll(() -> assertEquals("pepe@gmail.com",cliente.getEmail()),
-                () -> assertEquals("lucho@gmail.com",cliente.getEmail()));
+        assertEquals("pepe@gmail.com",cliente.getEmail());
     }
 
     @Test
     void getCiudad() {
         Cliente cliente = new Cliente(id, nombre, email ,ciudad);
-        Assertions.assertAll(() -> assertEquals("Nueva York",cliente.getCiudad()),
-                () -> assertEquals("lucho@gmail.com",cliente.getCiudad()));
+        assertEquals("Nueva York",cliente.getCiudad());
     }
 }
