@@ -329,23 +329,5 @@ public class HelloController {
         return fileChooser.showSaveDialog(null);
     }
 
-    public void Selectventana() {
-        try {
-            Stage stage2 = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("accept.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 300, 120);
-            stage2.setTitle("Ventana de Guardado");
-            stage2.setScene(scene);
-            stage2.show();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-
-
-
-
+   
 }
