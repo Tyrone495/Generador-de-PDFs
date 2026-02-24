@@ -5,7 +5,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
@@ -14,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -64,6 +67,10 @@ public class HelloController {
     public Button help_button;
 
 
+    Helpcontroller help = new Helpcontroller();
+    ToggleGroup group = new ToggleGroup();
+
+
 
     private final ClienteDAO clienteDAO = new ClienteDAO();
     private final ObservableList<Cliente> masterData = FXCollections.observableArrayList();
@@ -91,9 +98,7 @@ public class HelloController {
      */
 
     public void initialize() {
-        SelectController select = new SelectController();
-        Helpcontroller help = new Helpcontroller();
-        ToggleGroup group = new ToggleGroup();
+
 
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -117,7 +122,7 @@ public class HelloController {
 
         changes_button.setOnAction(actionEvent -> aplicarfiltros());
         csv_button.setOnAction(actionEvent -> SeleccionarCSV());
-        pdf_button.setOnAction(actionEvent -> select.Selectventana());
+        pdf_button.setOnAction(actionEvent -> exportarAPDF());
 
         help_button.setOnAction(actionEvent -> help.ayudaVentana());
 
@@ -284,9 +289,11 @@ public class HelloController {
             doc.save(archivoDestino);
 
 
+
+
         } catch (Exception e) {
-            System.err.println("Error detallado: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error al graficár el Archivo PDF");
+            System.out.println("Inténtelo de nuevo, por favor.");
         }
     }
 
@@ -320,6 +327,20 @@ public class HelloController {
         fileChooser.setInitialFileName("reporte_clientes.pdf");
 
         return fileChooser.showSaveDialog(null);
+    }
+
+    public void Selectventana() {
+        try {
+            Stage stage2 = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("accept.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 300, 120);
+            stage2.setTitle("Ventana de Guardado");
+            stage2.setScene(scene);
+            stage2.show();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

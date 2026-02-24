@@ -8,10 +8,10 @@
 
     <VBox spacing="20">
         <padding>
-            <Insets top="30"/>
+            <Insets left="20" top="30"/>
         </padding>
     <Label text="Autor: Tyrone Pulla"/>
-    <Label text="Código Fuente: https://github.com/Tyrone495" />
+    <Label text="Código Fuente: https://github.com/Tyrone495"/>
     </VBox>
 
 
